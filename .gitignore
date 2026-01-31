@@ -1,0 +1,5 @@
+build/
+_vendor_src/
+__pycache__/
+*.pyc
+.DS_Store

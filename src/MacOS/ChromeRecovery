@@ -1,0 +1,22 @@
+#!/bin/bash
+# ChromeRecovery launcher — finds Python 3 and runs the recovery script.
+
+DIR="$(cd "$(dirname "$0")/.." && pwd)"
+RESOURCES="$DIR/Resources"
+
+# Check for Python 3
+if ! command -v python3 &>/dev/null; then
+    osascript -e 'display dialog "Python 3 is required but was not found on this Mac.\n\nYou can install it by:\n1. Opening Terminal\n2. Typing: xcode-select --install\n\nOr download it from python.org." with title "ChromeRecovery" buttons {"OK"} default button "OK" with icon caution'
+    exit 1
+fi
+
+# Run the recovery script
+python3 "$RESOURCES/recover.py" 2>/tmp/chrome_recovery_error.log
+EXIT_CODE=$?
+
+if [ $EXIT_CODE -ne 0 ] && [ $EXIT_CODE -ne 1 ]; then
+    ERROR_MSG=$(cat /tmp/chrome_recovery_error.log 2>/dev/null | tail -5)
+    osascript -e "display dialog \"Something went wrong during recovery.\n\n$ERROR_MSG\" with title \"ChromeRecovery\" buttons {\"OK\"} default button \"OK\" with icon caution"
+fi
+
+rm -f /tmp/chrome_recovery_error.log
